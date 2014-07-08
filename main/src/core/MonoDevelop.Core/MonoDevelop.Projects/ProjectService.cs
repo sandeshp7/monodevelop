@@ -72,7 +72,8 @@ namespace MonoDevelop.Projects
 		const string SerializableClassesExtensionPath = "/MonoDevelop/ProjectModel/SerializableClasses";
 		const string ExtendedPropertiesExtensionPath = "/MonoDevelop/ProjectModel/ExtendedProperties";
 		const string ProjectBindingsExtensionPath = "/MonoDevelop/ProjectModel/ProjectBindings";
-		
+		const string FlavorsExtensionPath = "/MonoDevelop/ProjectModel/ProjectFlavors";
+
 		internal event EventHandler DataContextChanged;
 		
 		class ExtensionChainInfo
@@ -100,6 +101,15 @@ namespace MonoDevelop.Projects
 		public FileFormatManager FileFormats {
 			get { return formatManager; }
 		}
+
+		internal static Dictionary<string,ProjectFlavorNode> GetFlavorNodes ()
+		{
+			return AddinManager.GetExtensionNodes<ProjectFlavorNode> (FlavorsExtensionPath).ToDictionary (
+				f => f.Guid,
+				f => f,
+				StringComparer.OrdinalIgnoreCase
+			);
+		}
 		
 		internal ProjectServiceExtension GetExtensionChain (IBuildTarget target)
 		{
@@ -120,8 +130,18 @@ namespace MonoDevelop.Projects
 						einfo.ItemTypeCondition.ObjType = target.GetType ();
 						einfo.ProjectLanguageCondition.TargetProject = target;
 					}
-					ProjectServiceExtension[] extensions = einfo.ExtensionContext.GetExtensionObjects ("/MonoDevelop/ProjectModel/ProjectServiceExtensions", typeof(ProjectServiceExtension)).Cast<ProjectServiceExtension> ().ToArray ();
+					ProjectServiceExtension[] extensions = einfo.ExtensionContext.GetExtensionObjects<ProjectServiceExtension> ("/MonoDevelop/ProjectModel/ProjectServiceExtensions").ToArray ();
 					chain = CreateExtensionChain (extensions);
+
+					//if the project hass MSBuild flavors, hook them in at the start of the chain
+					var slnItem = target as SolutionItem;
+					if (slnItem != null && slnItem.ProjectFlavorChain != null) {
+						ProjectServiceExtension f = slnItem.ProjectFlavorChain;
+						while ((f.Next as ProjectFlavor) != null)
+							f = f.Next;
+						f.Next = chain;
+						chain = slnItem.ProjectFlavorChain;
+					}
 				
 					// After creating the chain there is no need to keep the reference to the target
 					einfo.ProjectLanguageCondition.TargetProject = null;

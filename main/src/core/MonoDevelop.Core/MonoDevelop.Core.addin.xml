@@ -129,6 +129,11 @@
 		<ExtensionNode name="DotNetProject" type="MonoDevelop.Projects.Extensions.DotNetProjectNode"/>
 		<ExtensionNode name="DotNetProjectSubtype" type="MonoDevelop.Projects.Extensions.DotNetProjectSubtypeNode"/>
 	</ExtensionPoint>
+
+	<ExtensionPoint path = "/MonoDevelop/ProjectModel/Flavors" name = "Project flavors">
+		<Description>MSBuild project flavors</Description>
+		<ExtensionNode name="Flavor" type="MonoDevelop.Projects.Extensions.ProjectFlavorNode"/>
+	</ExtensionPoint>
 	
 	<ExtensionPoint path = "/MonoDevelop/ProjectModel/PolicyTypes" name = "Policy types">
 		<Description>Types for per-project policies language binding. These types must be serializable.</Description>

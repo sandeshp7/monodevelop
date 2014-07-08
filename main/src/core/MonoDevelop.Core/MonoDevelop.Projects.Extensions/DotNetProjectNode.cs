@@ -50,9 +50,9 @@ namespace MonoDevelop.Projects.Extensions
 		{
 			if (base.CanHandleFile (fileName, typeGuid))
 				return true;
-			else if (!string.IsNullOrEmpty (typeGuid) && typeGuid.Contains (Guid))
-			{
-				DotNetProjectSubtypeNode node = MSBuildProjectService.GetDotNetProjectSubtype (typeGuid);
+			if (!string.IsNullOrEmpty (typeGuid) && typeGuid.Contains (Guid)) {
+				ProjectFlavor[] flavors;
+				var node = MSBuildProjectService.GetDotNetProjectSubtype (typeGuid, out flavors);
 				if (node != null && node.CanHandleFile (fileName, typeGuid))
 					return true;
 			}

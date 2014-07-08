@@ -30,7 +30,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
-using System.CodeDom.Compiler;
 using MonoDevelop.Core;
 using MonoDevelop.Core.Serialization;
 using MonoDevelop.Projects.Extensions;
@@ -44,6 +43,28 @@ namespace MonoDevelop.Projects
 {
 	public abstract class SolutionItem: IExtendedDataItem, IBuildTarget, ILoadController, IPolicyProvider
 	{
+		/// <summary>
+		/// Beware, this may have a ProjectServiceExtension chain attached at the end
+		/// </summary>
+		internal ProjectFlavor ProjectFlavorChain { get; private set; }
+
+		internal void BindFlavorChain (ProjectFlavor[] flavors)
+		{
+			if (flavors == null || flavors.Length == 0)
+				return;
+
+			var f = flavors [0];
+			f.Bind (this);
+
+			ProjectFlavorChain = f;
+
+			for (int i = 1; i < flavors.Length; i++) {
+				f.Next = flavors [i];
+				f = flavors [i];
+				f.Bind (this);
+			}
+		}
+
 		SolutionFolder parentFolder;
 		Solution parentSolution;
 		ISolutionItemHandler handler;
@@ -431,6 +452,14 @@ namespace MonoDevelop.Projects
 			if (userProperties != null) {
 				((IDisposable)userProperties).Dispose ();
 				userProperties = null;
+			}
+			if (ProjectFlavorChain != null) {
+				while (ProjectFlavorChain != null) {
+					var disp = ProjectFlavorChain as IDisposable;
+					if (disp != null)
+						disp.Dispose ();
+					ProjectFlavorChain = ProjectFlavorChain.Next as ProjectFlavor;
+				}
 			}
 			
 			// parentFolder = null;

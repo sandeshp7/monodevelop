@@ -450,8 +450,9 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			if (ProjectTypeIsUnsupported)
 				return new UnknownProject (fileName, UnknownProjectTypeInfo.GetInstructions ());
 
+			ProjectFlavor[] flavors = null;
 			if (subtypeGuids.Any ()) {
-				DotNetProjectSubtypeNode st = MSBuildProjectService.GetDotNetProjectSubtype (subtypeGuids);
+				DotNetProjectSubtypeNode st = MSBuildProjectService.GetDotNetProjectSubtype (subtypeGuids, out flavors);
 				if (st != null) {
 					UseMSBuildEngineByDefault = st.UseXBuild;
 					RequireMSBuildEngine = st.RequireXBuild;
@@ -478,7 +479,8 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 					}
 
 					var item = st.CreateInstance (language);
-					st.UpdateImports ((SolutionEntityItem)item, targetImports);
+					item.BindFlavorChain (flavors);
+					st.UpdateImports (item, targetImports);
 					return item;
 				} else {
 					var projectInfo = MSBuildProjectService.GetUnknownProjectTypeInfo (subtypeGuids.ToArray (), fileName);
@@ -494,10 +496,12 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 				return (SolutionItem) Activator.CreateInstance (itemClass);
 			
 			if (!string.IsNullOrEmpty (language)) {
-				//enable msbuild by default .NET assembly projects
+				//enable MSBuild by default for .NET assembly projects
 				UseMSBuildEngineByDefault = true;
 				RequireMSBuildEngine = false;
-				return new DotNetAssemblyProject (language);
+				var dnap = new DotNetAssemblyProject (language);
+				dnap.BindFlavorChain (flavors);
+				return dnap;
 			}
 			
 			if (string.IsNullOrEmpty (itemType))
@@ -507,7 +511,9 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			if (dt == null)
 				throw new UnknownSolutionItemTypeException (itemType);
 				
-			return (SolutionItem) Activator.CreateInstance (dt.ValueType);
+			var createdItem = (SolutionItem) Activator.CreateInstance (dt.ValueType);
+			createdItem.BindFlavorChain (flavors);
+			return createdItem;
 		}
 
 		Type MigrateProject (IProgressMonitor monitor, DotNetProjectSubtypeNode st, MSBuildProject p, string fileName, string language)

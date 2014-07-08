@@ -223,19 +223,29 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			require = handler.RequireMSBuildEngine;
 		}
 
-		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (string typeGuids)
+		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (string typeGuids, out ProjectFlavor[] flavors)
 		{
 			if (!string.IsNullOrEmpty (typeGuids))
-				return GetDotNetProjectSubtype (typeGuids.Split (';').Select (t => t.Trim ()));
-			else
-				return null;
+				return GetDotNetProjectSubtype (typeGuids.Split (';').Select (t => t.Trim ()), out flavors);
+			flavors = null;
+			return null;
 		}
 
-		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (IEnumerable<string> typeGuids)
+		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (IEnumerable<string> typeGuids, out ProjectFlavor[] flavors)
 		{
+			var flavorNodes = ProjectService.GetFlavorNodes ();
+			var flavorList = new List<ProjectFlavor> ();
+
 			Type ptype = null;
 			DotNetProjectSubtypeNode foundNode = null;
 			foreach (string guid in typeGuids) {
+				ProjectFlavorNode node;
+				if (flavorNodes.TryGetValue (guid, out node)) {
+					var flavor = (ProjectFlavor)node.CreateInstance ();
+					flavor.Guid = node.Guid;
+					flavorList.Add (flavor);
+					continue;
+				}
 				foreach (DotNetProjectSubtypeNode st in GetItemSubtypeNodes ()) {
 					if (st.SupportsType (guid)) {
 						if (ptype == null || ptype.IsAssignableFrom (st.Type)) {
@@ -245,6 +255,7 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 					}
 				}
 			}
+			flavors = flavorList.ToArray ();
 			return foundNode;
 		}
 
