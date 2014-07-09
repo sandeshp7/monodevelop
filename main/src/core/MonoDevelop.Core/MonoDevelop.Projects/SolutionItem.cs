@@ -48,6 +48,23 @@ namespace MonoDevelop.Projects
 		/// </summary>
 		internal ProjectFlavor ProjectFlavorChain { get; private set; }
 
+		/// <summary>
+		/// Determines whether this item has the specified flavor.
+		/// </summary>
+		/// <param name="id">Flavor GUID, flavor ID, or project type ID.</param>
+		public virtual bool HasFlavor (string id)
+		{
+			var f = ProjectFlavorChain;
+			while (f != null) {
+				if (string.Equals (f.Id, id, StringComparison.OrdinalIgnoreCase))
+					return true;
+				if (string.Equals (f.Guid, id, StringComparison.OrdinalIgnoreCase))
+					return true;
+				f = f.Next as ProjectFlavor;
+			}
+			return false;
+		}
+
 		internal void BindFlavorChain (ProjectFlavor[] flavors)
 		{
 			if (flavors == null || flavors.Length == 0)

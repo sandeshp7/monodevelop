@@ -38,8 +38,20 @@ namespace MonoDevelop.Projects
 			Item = item;
 		}
 
+		/// <summary>
+		/// The item to which this flavor instance is bound.
+		/// </summary>
 		protected SolutionItem Item { get; private set; }
+
+		/// <summary>
+		/// The flavor GUID.
+		/// </summary>
 		public string Guid { get; internal set; }
+
+		/// <summary>
+		/// Human-readable ID, may be used instead of the GUID within the MonoDevelop API.
+		/// </summary>
+		public string Id { get; internal set; }
 	}
 }
 

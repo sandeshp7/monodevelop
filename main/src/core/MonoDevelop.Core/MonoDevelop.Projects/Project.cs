@@ -121,7 +121,7 @@ namespace MonoDevelop.Projects
 		/// <value>
 		/// The type of the project.
 		/// </value>
-		[Obsolete ("Use GetProjectTypes")]
+		[Obsolete ("Use HasFlavor")]
 		public virtual string ProjectType {
 			get { return GetProjectTypes ().First (); }
 		}
@@ -129,7 +129,23 @@ namespace MonoDevelop.Projects
 		/// <summary>
 		/// Gets the project type and its base types.
 		/// </summary>
+		[Obsolete ("Use HasFlavor")]
 		public abstract IEnumerable<string> GetProjectTypes ();
+
+		public virtual bool HasFlavor (string id)
+		{
+			if (base.HasFlavor (id))
+				return true;
+
+			#pragma warning disable 618
+			//NOTE: this will be removed when all project type IDs have been replaced by flavors
+			foreach (var type in GetProjectTypes ())
+				if (string.Equals (type, id, StringComparison.OrdinalIgnoreCase))
+					return true;
+			#pragma warning restore 618
+
+			return false;
+		}
 
 		/// <summary>
 		/// Gets or sets the icon of the project.

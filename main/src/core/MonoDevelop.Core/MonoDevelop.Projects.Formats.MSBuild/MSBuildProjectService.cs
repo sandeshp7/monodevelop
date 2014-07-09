@@ -243,6 +243,8 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 				if (flavorNodes.TryGetValue (guid, out node)) {
 					var flavor = (ProjectFlavor)node.CreateInstance ();
 					flavor.Guid = node.Guid;
+					if (node.HasId)
+						flavor.Id = node.Id;
 					flavorList.Add (flavor);
 					continue;
 				}
