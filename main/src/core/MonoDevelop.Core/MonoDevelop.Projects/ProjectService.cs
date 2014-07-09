@@ -143,7 +143,7 @@ namespace MonoDevelop.Projects
 					ProjectServiceExtension[] extensions = einfo.ExtensionContext.GetExtensionObjects<ProjectServiceExtension> ("/MonoDevelop/ProjectModel/ProjectServiceExtensions").ToArray ();
 					chain = CreateExtensionChain (extensions);
 
-					//if the project hass MSBuild flavors, hook them in at the start of the chain
+					//if the project has MSBuild flavors, hook them in at the start of the chain
 					var slnItem = target as SolutionItem;
 					if (slnItem != null && slnItem.ProjectFlavorChain != null) {
 						ProjectServiceExtension f = slnItem.ProjectFlavorChain;

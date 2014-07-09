@@ -26,9 +26,10 @@
 //
 
 using System;
+using System.Collections.Generic;
 using Mono.Addins;
-using MonoDevelop.Core;
 using MonoDevelop.Projects.Formats.MSBuild;
+using MonoDevelop.Core;
 using MonoDevelop.Projects.Extensions;
 
 namespace MonoDevelop.Projects.Extensions
@@ -51,8 +52,9 @@ namespace MonoDevelop.Projects.Extensions
 			if (base.CanHandleFile (fileName, typeGuid))
 				return true;
 			if (!string.IsNullOrEmpty (typeGuid) && typeGuid.Contains (Guid)) {
-				ProjectFlavor[] flavors;
-				var node = MSBuildProjectService.GetDotNetProjectSubtype (typeGuid, out flavors);
+				List<ProjectFlavor> flavors;
+				List<string> unknownFlavors;
+				var node = MSBuildProjectService.GetDotNetProjectSubtype (typeGuid, out flavors, out unknownFlavors);
 				if (node != null && node.CanHandleFile (fileName, typeGuid))
 					return true;
 			}

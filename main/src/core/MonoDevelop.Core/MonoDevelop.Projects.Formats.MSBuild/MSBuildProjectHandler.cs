@@ -450,9 +450,13 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			if (ProjectTypeIsUnsupported)
 				return new UnknownProject (fileName, UnknownProjectTypeInfo.GetInstructions ());
 
-			ProjectFlavor[] flavors = null;
 			if (subtypeGuids.Any ()) {
-				DotNetProjectSubtypeNode st = MSBuildProjectService.GetDotNetProjectSubtype (subtypeGuids, out flavors);
+				List<ProjectFlavor> flavors = null;
+				List<string> unknownFlavors = null;
+				var st = MSBuildProjectService.GetDotNetProjectSubtype (subtypeGuids, out flavors, out unknownFlavors);
+				if (unknownFlavors != null && unknownFlavors.Count > 0) {
+					throw new UnknownSolutionItemTypeException (string.Join (";", unknownFlavors));
+				}
 				if (st != null) {
 					UseMSBuildEngineByDefault = st.UseXBuild;
 					RequireMSBuildEngine = st.RequireXBuild;
@@ -499,9 +503,7 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 				//enable MSBuild by default for .NET assembly projects
 				UseMSBuildEngineByDefault = true;
 				RequireMSBuildEngine = false;
-				var dnap = new DotNetAssemblyProject (language);
-				dnap.BindFlavorChain (flavors);
-				return dnap;
+				return new DotNetAssemblyProject (language);
 			}
 			
 			if (string.IsNullOrEmpty (itemType))
@@ -511,9 +513,7 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			if (dt == null)
 				throw new UnknownSolutionItemTypeException (itemType);
 				
-			var createdItem = (SolutionItem) Activator.CreateInstance (dt.ValueType);
-			createdItem.BindFlavorChain (flavors);
-			return createdItem;
+			return (SolutionItem)Activator.CreateInstance (dt.ValueType);
 		}
 
 		Type MigrateProject (IProgressMonitor monitor, DotNetProjectSubtypeNode st, MSBuildProject p, string fileName, string language)

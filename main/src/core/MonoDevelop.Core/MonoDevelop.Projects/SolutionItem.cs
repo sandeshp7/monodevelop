@@ -68,9 +68,9 @@ namespace MonoDevelop.Projects
 			return false;
 		}
 
-		internal void BindFlavorChain (ProjectFlavor[] flavors)
+		internal void BindFlavorChain (List<ProjectFlavor> flavors)
 		{
-			if (flavors == null || flavors.Length == 0)
+			if (flavors == null || flavors.Count == 0)
 				return;
 
 			var f = flavors [0];
@@ -78,7 +78,7 @@ namespace MonoDevelop.Projects
 
 			ProjectFlavorChain = f;
 
-			for (int i = 1; i < flavors.Length; i++) {
+			for (int i = 1; i < flavors.Count; i++) {
 				f.Next = flavors [i];
 				f = flavors [i];
 				f.Bind (this);

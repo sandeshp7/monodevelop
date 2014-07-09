@@ -223,11 +223,13 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			require = handler.RequireMSBuildEngine;
 		}
 
-		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (string typeGuids, out ProjectFlavor[] flavors)
+		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (
+			string typeGuids, out List<ProjectFlavor> flavors, out List<string> unknownFlavors)
 		{
 			if (!string.IsNullOrEmpty (typeGuids))
-				return GetDotNetProjectSubtype (typeGuids.Split (';').Select (t => t.Trim ()), out flavors);
-			flavors = null;
+				return GetDotNetProjectSubtype (typeGuids.Split (';').Select (t => t.Trim ()), out flavors, out unknownFlavors);
+			flavors = new List<ProjectFlavor> ();
+			unknownFlavors = new List<string> ();
 			return null;
 		}
 
@@ -247,9 +249,11 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			return false;
 		}
 
-		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (IEnumerable<string> typeGuids, out ProjectFlavor[] flavors)
+		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (
+			IEnumerable<string> typeGuids, out List<ProjectFlavor> flavors, out List<string> unknownFlavors)
 		{
-			var flavorList = new List<ProjectFlavor> ();
+			flavors = new List<ProjectFlavor> ();
+			unknownFlavors = new List<string> ();
 
 			Type ptype = null;
 			DotNetProjectSubtypeNode foundNode = null;
@@ -257,19 +261,22 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 				var node = Services.ProjectService.GetFlavorNode (guid);
 				if (node != null) {
 					var flavor = node.CreateInstance ();
-					flavorList.Add (flavor);
+					flavors.Add (flavor);
 					continue;
 				}
+				bool matched = false;
 				foreach (DotNetProjectSubtypeNode st in GetItemSubtypeNodes ()) {
 					if (st.SupportsType (guid)) {
 						if (ptype == null || ptype.IsAssignableFrom (st.Type)) {
+							matched = true;
 							ptype = st.Type;
 							foundNode = st;
 						}
 					}
 				}
+				if (!matched)
+					unknownFlavors.Add (guid);
 			}
-			flavors = flavorList.ToArray ();
 			return foundNode;
 		}
 
