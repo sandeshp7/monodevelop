@@ -24,150 +24,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Xml;
 using MonoDevelop.Projects;
 
 namespace MonoDevelop.AspNet.Projects
 {
-	abstract class AspMvcProject : AspNetAppProject
+	class AspMvc1ProjectFlavor : ProjectFlavor
 	{
-		protected AspMvcProject ()
-		{
-		}
-		
-		protected AspMvcProject (string languageName)
-			: base (languageName)
-		{
-		}
-		
-		protected AspMvcProject (string languageName, ProjectCreateInformation info, XmlElement projectOptions)
-			: base (languageName, info, projectOptions)
-		{
-		}	
-		
-		public override SolutionItemConfiguration CreateConfiguration (string name)
-		{
-			var conf = new AspMvcProjectConfiguration (name);
-			conf.CopyFrom (base.CreateConfiguration (name));			
-			return conf;
-		}
-
-		public override IEnumerable<string> GetProjectTypes ()
-		{
-			yield return "AspNetMvc";
-			foreach (var t in base.GetProjectTypes ())
-				yield return t;
-		}
-
-		public override bool SupportsFramework (MonoDevelop.Core.Assemblies.TargetFramework framework)
-		{
-			return framework.CanReferenceAssembliesTargetingFramework (MonoDevelop.Core.Assemblies.TargetFrameworkMoniker.NET_3_5);
-		}
-
-		public override bool IsAspMvcProject {
-			get {
-				return true;
-			}
-		}
 	}
 
-	class AspMvc1Project : AspMvcProject
+	class AspMvc2ProjectFlavor : ProjectFlavor
 	{
-		public AspMvc1Project ()
-		{
-		}
-
-		public AspMvc1Project (string languageName)
-			: base (languageName)
-		{
-		}
-
-		public AspMvc1Project (string languageName, ProjectCreateInformation info, XmlElement projectOptions)
-			: base (languageName, info, projectOptions)
-		{
-		}
-
-		protected override string GetDefaultAspNetMvcVersion ()
-		{
-			return "1.0.0.0";
-		}
 	}
 
-	class AspMvc2Project : AspMvcProject
+	class AspMvc3ProjectFlavor : ProjectFlavor
 	{
-		public AspMvc2Project ()
-		{
-		}
-
-		public AspMvc2Project (string languageName)
-			: base (languageName)
-		{
-		}
-
-		public AspMvc2Project (string languageName, ProjectCreateInformation info, XmlElement projectOptions)
-			: base (languageName, info, projectOptions)
-		{
-		}
-
-		protected override string GetDefaultAspNetMvcVersion ()
-		{
-			return "2.0.0.0";
-		}
 	}
 
-	class AspMvc3Project : AspMvcProject
+	class AspMvc4ProjectFlavor : ProjectFlavor
 	{
-		public AspMvc3Project ()
-		{
-		}
-
-		public AspMvc3Project (string languageName)
-			: base (languageName)
-		{
-		}
-
-		public AspMvc3Project (string languageName, ProjectCreateInformation info, XmlElement projectOptions)
-			: base (languageName, info, projectOptions)
-		{
-		}
-
-		public override bool SupportsFramework (MonoDevelop.Core.Assemblies.TargetFramework framework)
-		{
-			return framework.CanReferenceAssembliesTargetingFramework (MonoDevelop.Core.Assemblies.TargetFrameworkMoniker.NET_4_0);
-		}
-
-		protected override string GetDefaultAspNetMvcVersion ()
-		{
-			return "3.0.0.0";
-		}
-	}
-
-	class AspMvc4Project : AspMvcProject
-	{
-		public AspMvc4Project ()
-		{
-		}
-		
-		public AspMvc4Project (string languageName)
-			: base (languageName)
-		{
-		}
-		
-		public AspMvc4Project (string languageName, ProjectCreateInformation info, XmlElement projectOptions)
-			: base (languageName, info, projectOptions)
-		{
-		}
-		
-		public override bool SupportsFramework (MonoDevelop.Core.Assemblies.TargetFramework framework)
-		{
-			return framework.CanReferenceAssembliesTargetingFramework (MonoDevelop.Core.Assemblies.TargetFrameworkMoniker.NET_4_0);
-		}
-
-		protected override string GetDefaultAspNetMvcVersion ()
-		{
-			return "4.0.0.0";
-		}
 	}
 }
