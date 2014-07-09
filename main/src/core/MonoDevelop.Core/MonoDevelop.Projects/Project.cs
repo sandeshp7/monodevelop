@@ -132,7 +132,7 @@ namespace MonoDevelop.Projects
 		[Obsolete ("Use HasFlavor")]
 		public abstract IEnumerable<string> GetProjectTypes ();
 
-		public virtual bool HasFlavor (string id)
+		public override bool HasFlavor (string id)
 		{
 			if (base.HasFlavor (id))
 				return true;

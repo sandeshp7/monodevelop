@@ -54,11 +54,14 @@ namespace MonoDevelop.Projects
 		/// <param name="id">Flavor GUID, flavor ID, or project type ID.</param>
 		public virtual bool HasFlavor (string id)
 		{
+			Guid guid;
+			bool isGuid = MonoDevelop.Projects.Formats.MSBuild.MSBuildProjectService.TryParseGuid (id, out guid);
+
 			var f = ProjectFlavorChain;
 			while (f != null) {
 				if (string.Equals (f.Id, id, StringComparison.OrdinalIgnoreCase))
 					return true;
-				if (string.Equals (f.Guid, id, StringComparison.OrdinalIgnoreCase))
+				if (isGuid && f.Guid == guid)
 					return true;
 				f = f.Next as ProjectFlavor;
 			}

@@ -29,11 +29,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
 using System.IO;
-using MonoDevelop.Core;
 using MonoDevelop.Projects;
-using MonoDevelop.Core.Serialization;
 using System.Xml;
 
 namespace MonoDevelop.AspNet.Projects

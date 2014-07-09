@@ -46,6 +46,7 @@ namespace MonoDevelop.Projects
 			AddNewConfiguration ("Default");
 		}
 
+		[Obsolete]
 		public override IEnumerable<string> GetProjectTypes ()
 		{
 			yield return "CompiledAssembly";

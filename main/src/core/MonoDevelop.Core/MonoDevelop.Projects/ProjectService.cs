@@ -64,7 +64,9 @@ namespace MonoDevelop.Projects
 		
 		string defaultPlatformTarget = "x86";
 		static readonly TargetFrameworkMoniker DefaultTargetFrameworkId = TargetFrameworkMoniker.NET_4_0;
-		
+
+		Dictionary<Guid,ProjectFlavorNode> flavorNodes = new Dictionary<Guid,ProjectFlavorNode> ();
+
 		public const string BuildTarget = "Build";
 		public const string CleanTarget = "Clean";
 		
@@ -72,7 +74,7 @@ namespace MonoDevelop.Projects
 		const string SerializableClassesExtensionPath = "/MonoDevelop/ProjectModel/SerializableClasses";
 		const string ExtendedPropertiesExtensionPath = "/MonoDevelop/ProjectModel/ExtendedProperties";
 		const string ProjectBindingsExtensionPath = "/MonoDevelop/ProjectModel/ProjectBindings";
-		const string FlavorsExtensionPath = "/MonoDevelop/ProjectModel/ProjectFlavors";
+		const string FlavorsExtensionPath = "/MonoDevelop/ProjectModel/Flavors";
 
 		internal event EventHandler DataContextChanged;
 		
@@ -89,6 +91,7 @@ namespace MonoDevelop.Projects
 			AddinManager.AddExtensionNodeHandler (SerializableClassesExtensionPath, OnSerializableExtensionChanged);
 			AddinManager.AddExtensionNodeHandler (ExtendedPropertiesExtensionPath, OnPropertiesExtensionChanged);
 			AddinManager.AddExtensionNodeHandler (ProjectBindingsExtensionPath, OnProjectsExtensionChanged);
+			AddinManager.AddExtensionNodeHandler (FlavorsExtensionPath, OnFlavorsExtensionChanged);
 			AddinManager.ExtensionChanged += OnExtensionChanged;
 			
 			defaultFormat = formatManager.GetFileFormat (MSBuildProjectService.DefaultFormat);
@@ -102,13 +105,20 @@ namespace MonoDevelop.Projects
 			get { return formatManager; }
 		}
 
-		internal static Dictionary<string,ProjectFlavorNode> GetFlavorNodes ()
+		internal ProjectFlavorNode GetFlavorNode (Guid guid)
 		{
-			return AddinManager.GetExtensionNodes<ProjectFlavorNode> (FlavorsExtensionPath).ToDictionary (
-				f => f.Guid,
-				f => f,
-				StringComparer.OrdinalIgnoreCase
-			);
+			ProjectFlavorNode value;
+			if (flavorNodes.TryGetValue (guid, out value))
+				return value;
+			return null;
+		}
+
+		internal ProjectFlavorNode GetFlavorNode (string guid)
+		{
+			Guid g;
+			if (MSBuildProjectService.TryParseGuid (guid, out g))
+				return GetFlavorNode (g);
+			return null;
 		}
 		
 		internal ProjectServiceExtension GetExtensionChain (IBuildTarget target)
@@ -630,6 +640,15 @@ namespace MonoDevelop.Projects
 		{
 			if (args.Change == ExtensionChange.Add)
 				projectBindings.Add (args.ExtensionNode);
+		}
+
+		void OnFlavorsExtensionChanged (object sender, ExtensionNodeEventArgs args)
+		{
+			var node = (ProjectFlavorNode)args.ExtensionNode;
+			if (args.Change == ExtensionChange.Add)
+				flavorNodes.Add (node.Guid, node);
+			else
+				projectBindings.Remove (node.Guid);
 		}
 		
 		void OnExtensionChanged (object s, ExtensionEventArgs args)

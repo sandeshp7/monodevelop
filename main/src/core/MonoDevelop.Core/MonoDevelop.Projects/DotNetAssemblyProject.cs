@@ -47,6 +47,7 @@ namespace MonoDevelop.Projects
 		{
 		}
 
+		[Obsolete]
 		public override System.Collections.Generic.IEnumerable<string> GetProjectTypes ()
 		{
 			yield return "DotNetAssembly";

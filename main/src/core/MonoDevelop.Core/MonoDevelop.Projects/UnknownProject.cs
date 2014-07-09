@@ -50,9 +50,10 @@ namespace MonoDevelop.Projects
 			this.loadError = loadError;
 		}
 
+		[Obsolete]
 		public override IEnumerable<string> GetProjectTypes ()
 		{
-			yield return "";
+			yield break;
 		}
 
 		public override FilePath FileName {

@@ -24,13 +24,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using Mono.Addins;
+using System;
+using MonoDevelop.Projects.Formats.MSBuild;
 
 namespace MonoDevelop.Projects.Extensions
 {
 	class ProjectFlavorNode : TypeExtensionNode
 	{
+		#pragma warning disable 649
 		[NodeAttribute ("guid", true)]
-		public string Guid { get; private set; }
+		string guidStr;
+		#pragma warning restore 649
+		Guid? guid;
+
+		public Guid Guid {
+			get {
+				if (!guid.HasValue) {
+					Guid g;
+					if (!MSBuildProjectService.TryParseGuid (guidStr, out g))
+						throw new Exception ("Invalid flavour guid '" + guidStr + "'");
+					guid = g;
+				}
+				return guid.Value;
+			}
+		}
+
+		public new ProjectFlavor CreateInstance ()
+		{
+			var flavor = (ProjectFlavor) base.CreateInstance ();
+			flavor.Guid = Guid;
+			if (HasId)
+				flavor.Id = Id;
+			return flavor;
+		}
 	}
 }
-

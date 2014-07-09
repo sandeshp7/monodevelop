@@ -28,18 +28,22 @@ using MonoDevelop.Projects;
 
 namespace MonoDevelop.AspNet.Projects
 {
+	[ProjectFlavor("603C0E0B-DB56-11DC-BE95-000D561079B0")]
 	class AspMvc1ProjectFlavor : ProjectFlavor
 	{
 	}
 
+	[ProjectFlavor("F85E285D-A4E0-4152-9332-AB1D724D3325")]
 	class AspMvc2ProjectFlavor : ProjectFlavor
 	{
 	}
 
+	[ProjectFlavor("E53F8FEA-EAE0-44A6-8774-FFD645390401")]
 	class AspMvc3ProjectFlavor : ProjectFlavor
 	{
 	}
 
+	[ProjectFlavor("E3E379DF-F4C6-4180-9B81-6769533ABE47")]
 	class AspMvc4ProjectFlavor : ProjectFlavor
 	{
 	}

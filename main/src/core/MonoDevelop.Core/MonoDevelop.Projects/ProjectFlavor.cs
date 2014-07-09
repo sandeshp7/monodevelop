@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using Mono.Addins;
 
 namespace MonoDevelop.Projects
 {
@@ -46,12 +47,24 @@ namespace MonoDevelop.Projects
 		/// <summary>
 		/// The flavor GUID.
 		/// </summary>
-		public string Guid { get; internal set; }
+		public Guid Guid { get; internal set; }
 
 		/// <summary>
 		/// Human-readable ID, may be used instead of the GUID within the MonoDevelop API.
 		/// </summary>
 		public string Id { get; internal set; }
+	}
+
+	[AttributeUsage (AttributeTargets.Class, AllowMultiple = false)]
+	public class ProjectFlavorAttribute : CustomExtensionAttribute
+	{
+		public ProjectFlavorAttribute ([NodeAttribute ("guid")] string guid)
+		{
+			Guid = guid;
+		}
+
+		[NodeAttribute ("guid")]
+		public string Guid { get; private set; }
 	}
 }
 

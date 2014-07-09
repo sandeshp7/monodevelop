@@ -47,6 +47,7 @@ namespace MonoDevelop.Projects
 		{
 		}
 
+		[Obsolete]
 		public override IEnumerable<string> GetProjectTypes ()
 		{
 			yield return "PortableDotNet";

@@ -132,7 +132,10 @@
 
 	<ExtensionPoint path = "/MonoDevelop/ProjectModel/Flavors" name = "Project flavors">
 		<Description>MSBuild project flavors</Description>
-		<ExtensionNode name="Flavor" type="MonoDevelop.Projects.Extensions.ProjectFlavorNode"/>
+		<ExtensionNode name="Flavor"
+			type="MonoDevelop.Projects.Extensions.ProjectFlavorNode"
+			customAttributeType="MonoDevelop.Projects.ProjectFlavorAttribute"
+			objectType="MonoDevelop.Projects.ProjectFlavor" />
 	</ExtensionPoint>
 	
 	<ExtensionPoint path = "/MonoDevelop/ProjectModel/PolicyTypes" name = "Policy types">

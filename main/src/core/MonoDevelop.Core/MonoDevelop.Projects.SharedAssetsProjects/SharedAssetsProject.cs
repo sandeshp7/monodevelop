@@ -70,6 +70,7 @@ namespace MonoDevelop.Projects.SharedAssetsProjects
 
 		public string DefaultNamespace { get; set; }
 
+		[Obsolete]
 		public override IEnumerable<string> GetProjectTypes ()
 		{
 			yield return "SharedAssets";

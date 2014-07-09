@@ -231,20 +231,32 @@ namespace MonoDevelop.Projects.Formats.MSBuild
 			return null;
 		}
 
+		internal static bool TryParseGuid (string guidString, out Guid guid)
+		{
+			if (string.IsNullOrEmpty (guidString)) {
+				guid = new Guid ();
+				return false;
+			}
+
+			if (Guid.TryParse (guidString, out guid))
+				return true;
+
+			if (guidString [0] == '{' && guidString [guidString.Length - 1] == '}')
+				return Guid.TryParse (guidString.Substring (0, guidString.Length - 2), out guid);
+
+			return false;
+		}
+
 		internal static DotNetProjectSubtypeNode GetDotNetProjectSubtype (IEnumerable<string> typeGuids, out ProjectFlavor[] flavors)
 		{
-			var flavorNodes = ProjectService.GetFlavorNodes ();
 			var flavorList = new List<ProjectFlavor> ();
 
 			Type ptype = null;
 			DotNetProjectSubtypeNode foundNode = null;
 			foreach (string guid in typeGuids) {
-				ProjectFlavorNode node;
-				if (flavorNodes.TryGetValue (guid, out node)) {
-					var flavor = (ProjectFlavor)node.CreateInstance ();
-					flavor.Guid = node.Guid;
-					if (node.HasId)
-						flavor.Id = node.Id;
+				var node = Services.ProjectService.GetFlavorNode (guid);
+				if (node != null) {
+					var flavor = node.CreateInstance ();
 					flavorList.Add (flavor);
 					continue;
 				}
