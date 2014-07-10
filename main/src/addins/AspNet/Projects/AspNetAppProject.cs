@@ -536,10 +536,6 @@ namespace MonoDevelop.AspNet.Projects
 					continue;
 				}
 			}
-
-			if (IsAspMvcProject)
-				return GetDefaultAspNetMvcVersion ();
-
 			return null;
 		}
 
@@ -547,11 +543,6 @@ namespace MonoDevelop.AspNet.Projects
 			get {
 				return References.Any (r => r.Reference.StartsWith ("System.Web.WebPages.Razor", StringComparison.Ordinal));
 			}
-		}
-
-		protected virtual string GetDefaultAspNetMvcVersion ()
-		{
-			return "5.1.2";
 		}
 
 		public virtual bool IsAspMvcProject {
