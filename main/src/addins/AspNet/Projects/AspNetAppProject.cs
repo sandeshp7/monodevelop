@@ -36,8 +36,6 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 
-using ICSharpCode.NRefactory.TypeSystem;
-
 using MonoDevelop.Core;
 using MonoDevelop.Core.Assemblies;
 using MonoDevelop.Core.Execution;
@@ -45,7 +43,6 @@ using MonoDevelop.Core.ProgressMonitoring;
 using MonoDevelop.Core.Serialization;
 using MonoDevelop.Ide.Desktop;
 using MonoDevelop.Ide;
-using MonoDevelop.Ide.TypeSystem;
 using MonoDevelop.Projects;
 using MonoDevelop.AspNet.Execution;
 using MonoDevelop.AspNet.WebForms;
@@ -107,13 +104,13 @@ namespace MonoDevelop.AspNet.Projects
 			Init ();
 			
 			var binPath = info == null? (FilePath)"bin" : info.BinPath;
-			foreach (var cfg in Configurations.Cast<AspNetAppProjectConfiguration> ())
+			foreach (var cfg in Configurations.Cast<DotNetProjectConfiguration> ())
 				cfg.OutputDirectory = binPath;
 		}	
 		
 		public override SolutionItemConfiguration CreateConfiguration (string name)
 		{
-			var conf = new AspNetAppProjectConfiguration (name);
+			var conf = new DotNetProjectConfiguration (name);
 			conf.CopyFrom (base.CreateConfiguration (name));
 			conf.OutputDirectory = BaseDirectory.IsNullOrEmpty? "bin" : (string)BaseDirectory.Combine ("bin");
 			return conf;
@@ -124,9 +121,9 @@ namespace MonoDevelop.AspNet.Projects
 			codebehindTypeNameCache = new WebFormsCodeBehindTypeNameCache (this);
 		}
 
-		public new AspNetAppProjectConfiguration GetConfiguration (ConfigurationSelector configuration)
+		public new DotNetProjectConfiguration GetConfiguration (ConfigurationSelector configuration)
 		{
-			return (AspNetAppProjectConfiguration) base.GetConfiguration (configuration);
+			return (DotNetProjectConfiguration) base.GetConfiguration (configuration);
 		}
 		
 		#endregion
@@ -158,7 +155,7 @@ namespace MonoDevelop.AspNet.Projects
 			return new BuildResult ();
 		}
 		
-		ExecutionCommand CreateExecutionCommand (ConfigurationSelector config, AspNetAppProjectConfiguration configuration)
+		new ExecutionCommand CreateExecutionCommand (ConfigurationSelector config, DotNetProjectConfiguration configuration)
 		{
 			return new AspNetExecutionCommand {
 				ClrVersion = configuration.ClrVersion,
