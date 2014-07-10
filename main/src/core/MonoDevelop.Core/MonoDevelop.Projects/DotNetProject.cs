@@ -915,13 +915,16 @@ namespace MonoDevelop.Projects
 
 		protected virtual ExecutionCommand CreateExecutionCommand (ConfigurationSelector configSel, DotNetProjectConfiguration configuration)
 		{
-			DotNetExecutionCommand cmd = new DotNetExecutionCommand (configuration.CompiledOutputName);
-			cmd.Arguments = configuration.CommandLineParameters;
-			cmd.WorkingDirectory = Path.GetDirectoryName (configuration.CompiledOutputName);
-			cmd.EnvironmentVariables = configuration.GetParsedEnvironmentVariables ();
-			cmd.TargetRuntime = TargetRuntime;
-			cmd.UserAssemblyPaths = GetUserAssemblyPaths (configSel);
-			return cmd;
+			if (configuration.CompileTarget != CompileTarget.Exe && configuration.CompileTarget != CompileTarget.WinExe)
+				return null;
+
+			return new DotNetExecutionCommand (configuration.CompiledOutputName) {
+				Arguments = configuration.CommandLineParameters,
+				WorkingDirectory = Path.GetDirectoryName (configuration.CompiledOutputName),
+				EnvironmentVariables = configuration.GetParsedEnvironmentVariables (),
+				TargetRuntime = TargetRuntime,
+				UserAssemblyPaths = GetUserAssemblyPaths (configSel),
+			};
 		}
 
 		protected internal override bool OnGetCanExecute (ExecutionContext context, ConfigurationSelector configuration)
@@ -930,10 +933,12 @@ namespace MonoDevelop.Projects
 			if (config == null)
 				return false;
 			ExecutionCommand cmd = CreateExecutionCommand (configuration, config);
+			if (cmd == null)
+				return false;
 			if (context.ExecutionTarget != null)
 				cmd.Target = context.ExecutionTarget;
 
-			return (compileTarget == CompileTarget.Exe || compileTarget == CompileTarget.WinExe) && context.ExecutionHandler.CanExecute (cmd);
+			return context.ExecutionHandler.CanExecute (cmd);
 		}
 
 		protected internal override List<FilePath> OnGetItemFiles (bool includeReferencedFiles)
