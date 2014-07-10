@@ -24,11 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-
-
 namespace MonoDevelop.AspNet.Projects
 {
-	
 	public enum WebSubtype
 	{
 		None = 0,

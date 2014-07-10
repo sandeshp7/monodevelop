@@ -288,6 +288,7 @@
     <Compile Include="Razor\RazorCSharpParsedDocument.cs" />
     <Compile Include="Razor\RazorPageInfo.cs" />
     <Compile Include="WebForms\WebFormsTypeContext.cs" />
+    <Compile Include="Projects\WebSubtypeUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile.am" />

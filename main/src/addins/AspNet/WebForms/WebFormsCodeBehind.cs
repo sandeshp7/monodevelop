@@ -57,7 +57,7 @@ namespace MonoDevelop.AspNet.WebForms
 		{
 			var project = file.Project as AspNetAppProject;
 
-			var type = AspNetAppProject.DetermineWebSubtype (file.FilePath);
+			var type = WebSubtypeUtility.DetermineWebSubtype (file.FilePath);
 			if (type != WebSubtype.WebForm && type != WebSubtype.WebControl && type != WebSubtype.MasterPage)
 				return null;
 

@@ -219,86 +219,6 @@ namespace MonoDevelop.AspNet.Projects
 		
 		#endregion
 		
-		#region File utility methods
-		
-		public WebSubtype DetermineWebSubtype (ProjectFile file)
-		{
-			if (LanguageBinding != null && LanguageBinding.IsSourceCodeFile (file.FilePath))
-				return WebSubtype.Code;
-			return DetermineWebSubtype (file.Name);
-		}
-		
-		public static WebSubtype DetermineWebSubtype (string fileName)
-		{
-			string extension = Path.GetExtension (fileName);
-			if (extension == null)
-				return WebSubtype.None;
-			extension = extension.ToUpperInvariant ().TrimStart ('.');
-			
-			//NOTE: No way to identify WebSubtype.Code from here
-			//use the instance method for that
-			switch (extension) {
-			case "ASPX":
-				return WebSubtype.WebForm;
-			case "MASTER":
-				return WebSubtype.MasterPage;
-			case "ASHX":
-				return WebSubtype.WebHandler;
-			case "ASCX":
-				return WebSubtype.WebControl;
-			case "ASMX":
-				return WebSubtype.WebService;
-			case "ASAX":
-				return WebSubtype.Global;
-			case "GIF":
-			case "PNG":
-			case "JPG":
-				return WebSubtype.WebImage;
-			case "SKIN":
-				return WebSubtype.WebSkin;
-			case "CONFIG":
-				return WebSubtype.Config;
-			case "BROWSER":
-				return WebSubtype.BrowserDefinition;
-			case "AXD":
-				return WebSubtype.Axd;
-			case "SITEMAP":
-				return WebSubtype.Sitemap;
-			case "CSS":
-				return WebSubtype.Css;
-			case "XHTML":
-			case "HTML":
-			case "HTM":
-				return WebSubtype.Html;
-			case "JS":
-				return WebSubtype.JavaScript;
-			case "LESS":
-				return WebSubtype.Less;
-			case "SASS":
-			case "SCSS":
-				return WebSubtype.Sass;
-			case "EOT":
-			case "TTF":
-			case "OTF":
-			case "WOFF":
-				return WebSubtype.Font;
-			case "SVG":
-				return WebSubtype.Svg;
-			case "STYL":
-				return WebSubtype.Stylus;
-			case "CSHTML":
-				return WebSubtype.Razor;
-			default:
-				return WebSubtype.None;
-			}
-		}
-		
-		#endregion
-		
-		#region special files
-		
-		#endregion
-		
 		public ProjectFile ResolveVirtualPath (string virtualPath, string relativeToFile)
 		{
 			string name = VirtualToLocalPath (virtualPath, relativeToFile);
@@ -536,8 +456,7 @@ namespace MonoDevelop.AspNet.Projects
 		
 		public override string GetDefaultBuildAction (string fileName)
 		{
-			
-			WebSubtype type = DetermineWebSubtype (fileName);
+			WebSubtype type = WebSubtypeUtility.DetermineWebSubtype (fileName);
 			switch (type) {
 			case WebSubtype.Code:
 				return BuildAction.Compile;
@@ -551,24 +470,6 @@ namespace MonoDevelop.AspNet.Projects
 		static string[] groupedExtensions =  { ".aspx", ".master", ".ashx", ".ascx", ".asmx", ".asax" };
 		
 		#endregion
-		
-		public virtual IEnumerable<string> GetSpecialDirectories ()
-		{
-			yield return "App_Browsers";
-			yield return "App_Data";
-			yield return "App_GlobalResources";
-			yield return "App_LocalResources";
-			yield return "Theme";
-
-			if (IsAspMvcProject) {
-				yield return "Views";
-				yield return "Models";
-				yield return "Controllers";
-			}
-			
-			// For "web site" projects
-			// "App_WebReferences", "App_Resources","App_Themes", "App_Code",
-		}
 		
 		protected override IList<string> GetCommonBuildActions ()
 		{

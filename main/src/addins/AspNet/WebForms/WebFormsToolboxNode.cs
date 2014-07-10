@@ -157,7 +157,7 @@ namespace MonoDevelop.AspNet.WebForms
 		
 		public bool IsCompatibleWith (MonoDevelop.Ide.Gui.Document document)
 		{
-			switch (AspNetAppProject.DetermineWebSubtype (document.FileName)) {
+			switch (WebSubtypeUtility.DetermineWebSubtype (document.FileName)) {
 			case WebSubtype.WebForm:
 			case WebSubtype.MasterPage:
 			case WebSubtype.WebControl:

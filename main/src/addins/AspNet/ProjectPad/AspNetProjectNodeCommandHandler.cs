@@ -38,11 +38,10 @@ namespace MonoDevelop.AspNet.ProjectPad
 {
 	class AspNetProjectNodeCommandHandler: NodeCommandHandler
 	{
-		
 		[CommandHandler (AspNetCommands.AddAspNetDirectory)]
 		public void OnAddSpecialDirectory (object ob)
 		{
-			AspNetAppProject proj = CurrentNode.DataItem as AspNetAppProject;
+			var proj = CurrentNode.DataItem as AspNetAppProject;
 			if (proj == null)
 				return;
 			proj.AddDirectory ((string) ob);
@@ -52,13 +51,13 @@ namespace MonoDevelop.AspNet.ProjectPad
 		[CommandUpdateHandler (AspNetCommands.AddAspNetDirectory)]
 		public void OnAddSpecialDirectoryUpdate (CommandArrayInfo info)
 		{
-			AspNetAppProject proj = CurrentNode.DataItem as AspNetAppProject;
+			var proj = CurrentNode.DataItem as AspNetAppProject;
 			if (proj == null)
 				return;
 			
-			List<string> dirs = new List<string> (proj.GetSpecialDirectories ());
+			var dirs = new List<string> (GetSpecialDirectories (proj.IsAspMvcProject));
 			dirs.Sort ();
-			List<FilePath> fullPaths = new List<FilePath> (dirs.Count);
+			var fullPaths = new List<FilePath> (dirs.Count);
 			foreach (string s in dirs)
 				fullPaths.Add (proj.BaseDirectory.Combine (s));
 			RemoveDirsNotInProject (fullPaths, proj);
@@ -71,6 +70,24 @@ namespace MonoDevelop.AspNet.ProjectPad
 					continue;
 				info.Add (dir.Replace("_", "__"), dir);
 			}
+		}
+
+		static IEnumerable<string> GetSpecialDirectories (bool isMvc)
+		{
+			yield return "App_Browsers";
+			yield return "App_Data";
+			yield return "App_GlobalResources";
+			yield return "App_LocalResources";
+			yield return "Theme";
+
+			if (isMvc) {
+				yield return "Views";
+				yield return "Models";
+				yield return "Controllers";
+			}
+
+			// For "web site" projects
+			// "App_WebReferences", "App_Resources","App_Themes", "App_Code",
 		}
 
 		static void RemoveDirsNotInProject (List<FilePath> dirs, Project proj)
