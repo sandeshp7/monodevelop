@@ -119,11 +119,6 @@ namespace MonoDevelop.AspNet.Projects
 		{
 			codebehindTypeNameCache = new WebFormsCodeBehindTypeNameCache (this);
 		}
-
-		public new DotNetProjectConfiguration GetConfiguration (ConfigurationSelector configuration)
-		{
-			return (DotNetProjectConfiguration) base.GetConfiguration (configuration);
-		}
 		
 		#endregion
 		
@@ -148,12 +143,6 @@ namespace MonoDevelop.AspNet.Projects
 				UserAssemblyPaths = GetUserAssemblyPaths (config),
 				EnvironmentVariables = configuration.EnvironmentVariables,
 			};
-		}
-		
-		protected override bool OnGetCanExecute (ExecutionContext context, ConfigurationSelector configuration)
-		{
-			var cmd = CreateExecutionCommand (configuration, GetConfiguration (configuration));
-			return context.ExecutionHandler.CanExecute (cmd);
 		}
 		
 		protected override void DoExecute (IProgressMonitor monitor, ExecutionContext context, ConfigurationSelector configuration)
