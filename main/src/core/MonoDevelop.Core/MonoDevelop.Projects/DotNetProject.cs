@@ -506,7 +506,7 @@ namespace MonoDevelop.Projects
 		internal protected override void PopulateOutputFileList (List<FilePath> list, ConfigurationSelector configuration)
 		{
 			base.PopulateOutputFileList (list, configuration);
-			DotNetProjectConfiguration conf = GetConfiguration (configuration) as DotNetProjectConfiguration;
+			DotNetProjectConfiguration conf = GetConfiguration (configuration);
 			
 			// Debug info file
 			
@@ -581,7 +581,7 @@ namespace MonoDevelop.Projects
 						LoggingService.LogWarning ("Project '{0}' referenced from '{1}' could not be found", projectReference.Reference, this.Name);
 						continue;
 					}
-					DotNetProjectConfiguration conf = p.GetConfiguration (configuration) as DotNetProjectConfiguration;
+					DotNetProjectConfiguration conf = p.GetConfiguration (configuration);
 					//VS COMPAT: recursively copy references's "local copy" files
 					//but only copy the "copy to output" files from the immediate references
 					if (processedProjects.Add (p) || supportReferDistance == 1) {
@@ -771,7 +771,7 @@ namespace MonoDevelop.Projects
 				}
 			}
 
-			var config = (DotNetProjectConfiguration)GetConfiguration (configuration);
+			var config = GetConfiguration (configuration);
 			bool noStdLib = false;
 			if (config != null) {
 				var parameters = config.CompilationParameters as DotNetConfigurationParameters;
@@ -826,10 +826,14 @@ namespace MonoDevelop.Projects
 			return conf;
 		}
 
+		public new DotNetProjectConfiguration GetConfiguration (ConfigurationSelector configuration)
+		{
+			return (DotNetProjectConfiguration) base.GetConfiguration (configuration);
+		}
 
 		public override FilePath GetOutputFileName (ConfigurationSelector configuration)
 		{
-			DotNetProjectConfiguration conf = (DotNetProjectConfiguration)GetConfiguration (configuration);
+			DotNetProjectConfiguration conf = GetConfiguration (configuration);
 			if (conf != null)
 				return conf.CompiledOutputName;
 			else
@@ -871,7 +875,7 @@ namespace MonoDevelop.Projects
 				}
 			}
 
-			var config = (DotNetProjectConfiguration) GetConfiguration (configuration);
+			var config = GetConfiguration (configuration);
 			return Files.Any (file => file.BuildAction == BuildAction.EmbeddedResource
 					&& String.Compare (Path.GetExtension (file.FilePath), ".resx", StringComparison.OrdinalIgnoreCase) == 0
 					&& MD1DotNetProjectHandler.IsResgenRequired (file.FilePath, config.IntermediateOutputDirectory.Combine (file.ResourceId)));
@@ -882,7 +886,7 @@ namespace MonoDevelop.Projects
 			var outputBuildTime = base.OnGetLastBuildTime (configuration);
 			
 			//if the debug file is newer than the output file, use that as the build time
-			var conf = (DotNetProjectConfiguration) GetConfiguration (configuration);
+			var conf = GetConfiguration (configuration);
 			if (GeneratesDebugInfoFile && conf != null && conf.DebugMode) {
 				string file = GetOutputFileName (configuration);
 				if (file != null) {
@@ -922,7 +926,7 @@ namespace MonoDevelop.Projects
 
 		protected internal override bool OnGetCanExecute (ExecutionContext context, ConfigurationSelector configuration)
 		{
-			DotNetProjectConfiguration config = (DotNetProjectConfiguration) GetConfiguration (configuration);
+			DotNetProjectConfiguration config = GetConfiguration (configuration);
 			if (config == null)
 				return false;
 			ExecutionCommand cmd = CreateExecutionCommand (configuration, config);
@@ -1208,7 +1212,7 @@ namespace MonoDevelop.Projects
 
 		protected override void DoExecute (IProgressMonitor monitor, ExecutionContext context, ConfigurationSelector configuration)
 		{
-			DotNetProjectConfiguration dotNetProjectConfig = GetConfiguration (configuration) as DotNetProjectConfiguration;
+			DotNetProjectConfiguration dotNetProjectConfig = GetConfiguration (configuration);
 			monitor.Log.WriteLine (GettextCatalog.GetString ("Running {0} ...", dotNetProjectConfig.CompiledOutputName));
 
 			IConsole console = dotNetProjectConfig.ExternalConsole
