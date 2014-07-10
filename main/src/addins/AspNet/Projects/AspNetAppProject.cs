@@ -37,7 +37,6 @@ using System.Reflection;
 using System.Xml;
 
 using MonoDevelop.Core;
-using MonoDevelop.Core.Assemblies;
 using MonoDevelop.Core.Execution;
 using MonoDevelop.Core.ProgressMonitoring;
 using MonoDevelop.Core.Serialization;
@@ -136,24 +135,6 @@ namespace MonoDevelop.AspNet.Projects
 		}
 		
 		#region build/prebuild/execute
-		
-		
-		protected override BuildResult DoBuild (IProgressMonitor monitor, ConfigurationSelector configuration)
-		{
-			//if no files are set to compile, then some compilers will error out
-			//though this is valid with ASP.NET apps, so we just avoid calling the compiler in this case
-			bool needsCompile = false;
-			foreach (ProjectFile pf in Files) {
-				if (pf.BuildAction == BuildAction.Compile) {
-					needsCompile = true;
-					break;
-				}
-			}
-			
-			if (needsCompile)
-				return base.DoBuild (monitor, configuration);
-			return new BuildResult ();
-		}
 		
 		new ExecutionCommand CreateExecutionCommand (ConfigurationSelector config, DotNetProjectConfiguration configuration)
 		{
