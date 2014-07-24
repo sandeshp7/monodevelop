@@ -345,6 +345,11 @@
     <Compile Include="MonoDevelop.PackageManagement\UpdatePackagesProgressMonitorStatusMessage.cs" />
     <Compile Include="MonoDevelop.PackageManagement\CheckForUpdatedPackagesAction.cs" />
     <Compile Include="MonoDevelop.PackageManagement\RestoreBeforeUpdateAction.cs" />
+    <Compile Include="MonoDevelop.PackageManagement\FileRemovingEventArgs.cs" />
+    <Compile Include="MonoDevelop.PackageManagement\PreventPackagesConfigFileBeingRemovedOnUpdateMonitor.cs" />
+    <Compile Include="MonoDevelop.PackageManagement\FilePathExtensions.cs" />
+    <Compile Include="MonoDevelop.PackageManagement\FileRemover.cs" />
+    <Compile Include="MonoDevelop.PackageManagement\IFileRemover.cs" />
     <Compile Include="MonoDevelop.PackageManagement\MonoDevelopAggregateRepository.cs" />
     <Compile Include="MonoDevelop.PackageManagement\RestorePackagesAction.cs" />
     <Compile Include="MonoDevelop.PackageManagement.Commands\RestorePackagesInProjectHandler.cs" />
