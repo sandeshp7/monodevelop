@@ -334,6 +334,9 @@ namespace MonoDevelop.Ide
 						gtkrc += "-vista";
 				} else if (Platform.IsMac) {
 					gtkrc += ".mac";
+					var osv = Environment.OSVersion.Version;
+					if (osv.Major < 14)
+						gtkrc += "-aqua";
 				}
 				Environment.SetEnvironmentVariable ("GTK2_RC_FILES", PropertyService.EntryAssemblyPath.Combine (gtkrc));
 			}
