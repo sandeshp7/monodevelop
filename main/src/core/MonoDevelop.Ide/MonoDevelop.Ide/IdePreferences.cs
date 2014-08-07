@@ -65,14 +65,14 @@ namespace MonoDevelop.Ide
 	{
 		internal IdePreferences ()
 		{
-			FontService.RegisterFontChangedCallback ("OutputPad", delegate {
+			FontService.OutputPadFontChanged += delegate {
 				if (CustomOutputPadFontChanged != null)
 					CustomOutputPadFontChanged (null, EventArgs.Empty);
-			});
-			FontService.RegisterFontChangedCallback ("Pad", delegate {
+			};
+			FontService.PadFontChanged += delegate {
 				if (CustomPadFontChanged != null)
 					CustomPadFontChanged (null, EventArgs.Empty);
-			});
+			};
 		}
 		
 		public bool LoadPrevSolutionOnStartup {
@@ -250,7 +250,7 @@ namespace MonoDevelop.Ide
 		/// Font to use for treeview pads. Returns null if no custom font is set.
 		/// </summary>
 		public Pango.FontDescription CustomPadFont {
-			get { return FontService.GetFontDescription ("Pad", false); }
+			get { return FontService.PadFont; }
 		}
 
 		public event EventHandler<EventArgs> CustomPadFontChanged;
@@ -259,7 +259,7 @@ namespace MonoDevelop.Ide
 		/// Font to use for output pads. Returns null if no custom font is set.
 		/// </summary>
 		public Pango.FontDescription CustomOutputPadFont {
-			get { return FontService.GetFontDescription ("OutputPad", false); }
+			get { return FontService.OutputPadFont; }
 		}
 
 		public event EventHandler CustomOutputPadFontChanged;

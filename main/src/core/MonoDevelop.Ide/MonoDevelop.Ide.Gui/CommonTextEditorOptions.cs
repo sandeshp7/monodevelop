@@ -42,7 +42,7 @@ namespace MonoDevelop.Ide.Gui
 			PropertyService.PropertyChanged += PropertyServiceChanged;
 			base.FontName = PropertyService.Get ("FontName", FontService.MonospaceFontName);
 			base.ColorScheme = IdeApp.Preferences.ColorScheme;
-			FontService.RegisterFontChangedCallback ("Editor", UpdateFont);
+			FontService.EditorFontChanged += UpdateFont;
 		}
 		
 		public override void Dispose ()
@@ -51,7 +51,7 @@ namespace MonoDevelop.Ide.Gui
 				return;
 			disposed = true;
 			PropertyService.PropertyChanged -= PropertyServiceChanged;
-			FontService.RemoveCallback (UpdateFont);
+			FontService.EditorFontChanged -= UpdateFont;
 		}
 		
 		void UpdateFont ()
@@ -80,7 +80,7 @@ namespace MonoDevelop.Ide.Gui
 		
 		public override string FontName {
 			get {
-				return FontService.FilterFontName (FontService.GetUnderlyingFontName ("Editor"));
+				return FontService.EditorFontName;
 			}
 			set {
 				throw new InvalidOperationException ("Set via global source editor options");

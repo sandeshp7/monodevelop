@@ -90,15 +90,16 @@ namespace MonoDevelop.SourceEditor
 			LoadAllPrefs ();
 			UpdateStylePolicy (currentPolicy);
 			PropertyService.PropertyChanged += UpdatePreferences;
-			FontService.RegisterFontChangedCallback ("Editor", UpdateFont);
-			FontService.RegisterFontChangedCallback ("Pad", UpdateFont);
+			FontService.EditorFontChanged += UpdateFont;
+			FontService.PadFontChanged += UpdateFont;
 			
 		}
 		
 		public override void Dispose()
 		{
 			PropertyService.PropertyChanged -= UpdatePreferences;
-			FontService.RemoveCallback (UpdateFont);
+			FontService.EditorFontChanged -= UpdateFont;
+			FontService.PadFontChanged -= UpdateFont;
 		}
 		
 		void UpdateFont ()
@@ -660,7 +661,7 @@ namespace MonoDevelop.SourceEditor
 
 		public override string FontName {
 			get {
-				return FontService.FilterFontName (FontService.GetUnderlyingFontName ("Editor"));
+				return FontService.EditorFontName;
 			}
 			set {
 				throw new InvalidOperationException ("Set font through font service");
@@ -669,7 +670,7 @@ namespace MonoDevelop.SourceEditor
 		
 		public override string GutterFontName {
 			get {
-				return FontService.FilterFontName (FontService.GetUnderlyingFontName ("Editor"));
+				return FontService.EditorFontName;
 			}
 			set {
 				throw new InvalidOperationException ("Set font through font service");

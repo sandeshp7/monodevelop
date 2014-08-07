@@ -84,7 +84,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 				return;
 
 			using (var layout = new Pango.Layout (PangoContext)) {
-				layout.FontDescription = FontService.GetFontDescription ("Editor");
+				layout.FontDescription = FontService.EditorFont;
 				layout.SetMarkup (tooltipInformation.SignatureMarkup);
 				int w, h;
 				layout.GetPixelSize (out w, out h);
@@ -136,7 +136,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 					contentLabel.MaxWidth = 400;
 					contentLabel.Markup = o.FooterMarkup.Trim ();
 					contentLabel.ModifyFg (StateType.Normal, foreColor.ToGdkColor ());
-					contentLabel.FontDescription = FontService.GetFontDescription ("Editor");
+					contentLabel.FontDescription = FontService.EditorFont;
 
 					descriptionBox.PackEnd (contentLabel, true, true, 4);
 				}
@@ -201,7 +201,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 				var catLabel = new FixedWidthWrapLabel ();
 				catLabel.Text = categoryName;
 				catLabel.ModifyFg (StateType.Normal, foreColor.ToGdkColor ());
-				catLabel.FontDescription = FontService.GetFontDescription ("Editor");
+				catLabel.FontDescription = FontService.EditorFont;
 				vbox.PackStart (catLabel, false, true, 0);
 			}
 
@@ -212,7 +212,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 			contentLabel.MaxWidth = 400;
 			contentLabel.Markup = categoryContentMarkup.Trim ();
 			contentLabel.ModifyFg (StateType.Normal, foreColor.ToGdkColor ());
-			contentLabel.FontDescription = FontService.GetFontDescription ("Editor");
+			contentLabel.FontDescription = FontService.EditorFont;
 
 			vbox.PackStart (contentLabel, true, true, 0);
 
@@ -244,7 +244,7 @@ namespace MonoDevelop.Ide.CodeCompletion
 			
 			headLabel = new FixedWidthWrapLabel ();
 			headLabel.Indent = -20;
-			headLabel.FontDescription = FontService.GetFontDescription ("Editor").CopyModified (1.1);
+			headLabel.FontDescription = FontService.EditorFont.CopyModified (1.1);
 			headLabel.Wrap = Pango.WrapMode.WordChar;
 			headLabel.BreakOnCamelCasing = false;
 			headLabel.BreakOnPunctuation = false;
