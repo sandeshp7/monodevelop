@@ -2552,7 +2552,6 @@
     <Compile Include="gtk-gui\MonoDevelop.Ide.Fonts.FontChooserPanelWidget.cs" />
     <Compile Include="MonoDevelop.Ide.Fonts\FontChooserPanel.cs" />
     <Compile Include="MonoDevelop.Ide.Fonts\FontService.cs" />
-    <Compile Include="MonoDevelop.Ide.Fonts\FontDescriptionCodon.cs" />
     <Compile Include="MonoDevelop.Components.Extensions\AlertDialog.cs" />
     <Compile Include="MonoDevelop.Ide.Gui.Dialogs\GtkAlertDialog.cs" />
     <Compile Include="MonoDevelop.Components.Extensions\TextQuestionDialog.cs" />

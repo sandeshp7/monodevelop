@@ -46,61 +46,96 @@ namespace MonoDevelop.Ide.Fonts
 		{
 			if (customFonts.ContainsKey (fontName))
 				return customFonts [fontName];
-			
-			return FontService.GetUnderlyingFontName (fontName);
+			switch (fontName) {
+			case FontService.EditorKey:
+				return FontService.EditorFontName;
+			case FontService.PadKey:
+				return FontService.PadFontName;
+			case FontService.OutputPadKey:
+				return FontService.OutputPadFontName;
+			default:
+				throw new InvalidOperationException ("Font " + fontName + " not found.");
+			}
+		}
+
+		string GetDefaultFont (string name)
+		{
+			switch (name) {
+			case FontService.EditorKey:
+				return FontService.DefaultEditorFontName;
+			case FontService.PadKey:
+				return FontService.DefaultPadFontName;
+			case FontService.OutputPadKey:
+				return FontService.DefaultOutputPadFontName;
+			default:
+				throw new InvalidOperationException ("Font " + name + " not found.");
+			}
 		}
 
 		public void Store ()
 		{
 			foreach (var val in customFonts) {
-				FontService.SetFont (val.Key, val.Value);
+				switch (val.Key) {
+				case FontService.EditorKey:
+					FontService.EditorFontName = val.Value;
+					break;
+				case FontService.PadKey:
+					FontService.PadFontName = val.Value;
+					break;
+				case FontService.OutputPadKey:
+					FontService.OutputPadFontName = val.Value;
+					break;
+				default:
+					throw new InvalidOperationException ("Font " + val.Key + " not found.");
+				}
 			}
+		}
+
+		void AddFont (string name, string displayName)
+		{
+			var fontNameLabel = new Label (GettextCatalog.GetString (displayName));
+			fontNameLabel.Justify = Justification.Left;
+			fontNameLabel.Xalign = 0;
+			mainBox.PackStart (fontNameLabel, false, false, 0);
+			var hBox = new HBox ();
+			var setFontButton = new Button ();
+			setFontButton.Label = GetFont (name);
+			setFontButton.Clicked += delegate {
+				var selectionDialog = new FontSelectionDialog (GettextCatalog.GetString ("Select Font")) {
+					Modal = true,
+					DestroyWithParent = true,
+					TransientFor = this.Toplevel as Gtk.Window
+				};
+				try {
+					selectionDialog.SetFontName (GetFont (name));
+					if (MessageService.RunCustomDialog (selectionDialog) != (int)Gtk.ResponseType.Ok) {
+						return;
+					}
+					SetFont (name, selectionDialog.FontName);
+					setFontButton.Label = selectionDialog.FontName;
+				} finally {
+					selectionDialog.Destroy ();
+				}
+			};
+			hBox.PackStart (setFontButton, true, true, 0);
+			var setDefaultFontButton = new Button ();
+			setDefaultFontButton.Label = GettextCatalog.GetString ("Set To Default");
+			setDefaultFontButton.Clicked += delegate {
+				SetFont (name, GetDefaultFont (name));
+				setFontButton.Label = GetDefaultFont (name);
+			};
+			hBox.PackStart (setDefaultFontButton, false, false, 0);
+			mainBox.PackStart (hBox, false, false, 0);
 		}
 
 		public FontChooserPanelWidget ()
 		{
 			this.Build ();
 
-			foreach (var desc in FontService.FontDescriptions) {
-				var fontNameLabel = new Label (GettextCatalog.GetString (desc.DisplayName));
-				fontNameLabel.Justify = Justification.Left;
-				fontNameLabel.Xalign = 0;
-				mainBox.PackStart (fontNameLabel, false, false, 0);
-				var hBox = new HBox ();
-				var setFontButton = new Button ();
-				setFontButton.Label = FontService.FilterFontName (GetFont (desc.Name));
-				setFontButton.Clicked += delegate {
-					var selectionDialog = new FontSelectionDialog (GettextCatalog.GetString ("Select Font")) {
-						Modal = true,
-						DestroyWithParent = true,
-						TransientFor = this.Toplevel as Gtk.Window
-					};
-					try {
-						string fontValue = FontService.FilterFontName (GetFont (desc.Name));
-						selectionDialog.SetFontName (fontValue);
-						if (MessageService.RunCustomDialog (selectionDialog) != (int)Gtk.ResponseType.Ok) {
-							return;
-						}
-						fontValue = selectionDialog.FontName;
-						if (fontValue == FontService.FilterFontName (FontService.GetFont (desc.Name).FontDescription))
-							fontValue = FontService.GetFont (desc.Name).FontDescription;
-						SetFont (desc.Name, fontValue);
-						setFontButton.Label = selectionDialog.FontName;
-					} finally {
-						selectionDialog.Destroy ();
-					}
-				};
-				hBox.PackStart (setFontButton, true, true, 0);
+			AddFont (FontService.EditorKey, GettextCatalog.GetString ("Text Editor"));
+			AddFont (FontService.PadKey, GettextCatalog.GetString ("General Pad Text"));
+			AddFont (FontService.OutputPadKey, GettextCatalog.GetString ("Output Pad Contents"));
 
-				var setDefaultFontButton = new Button ();
-				setDefaultFontButton.Label = GettextCatalog.GetString ("Set To Default");
-				setDefaultFontButton.Clicked += delegate {
-					SetFont (desc.Name, FontService.GetFont (desc.Name).FontDescription);
-					setFontButton.Label = FontService.FilterFontName (GetFont (desc.Name));
-				};
-				hBox.PackStart (setDefaultFontButton, false, false, 0);
-				mainBox.PackStart (hBox, false, false, 0);
-			}
 			mainBox.ShowAll ();
 		}
 	}

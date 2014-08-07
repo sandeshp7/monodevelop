@@ -35,12 +35,15 @@ namespace MonoDevelop.Ide.Fonts
 {
 	public static class FontService
 	{
-		static List<FontDescriptionCodon> fontDescriptions = new List<FontDescriptionCodon> ();
-		static Dictionary<string, FontDescription> loadedFonts = new Dictionary<string, FontDescription> ();
+		internal const string EditorKey = "Editor";
+		internal const string PadKey = "Pad";
+		internal const string OutputPadKey = "OutputPad";
+
 		static Properties fontProperties;
 
-		static string defaultMonospaceFontName, defaultSansFontName;
-		static FontDescription defaultMonospaceFont, defaultSansFont;
+		static string editorFontName, padFontName, outputPadFontName;
+		static string defaultMonospaceFontName, defaultSansFontName, defaultEditorFontName, defaultPadFontName, defaultOutputPadFontName;
+		static FontDescription defaultMonospaceFont, defaultSansFont, editorFont, padFont, outputPadFont;
 
 		static void LoadDefaults ()
 		{
@@ -58,59 +61,136 @@ namespace MonoDevelop.Ide.Fonts
 			defaultSansFont = label.Style.FontDescription.Copy ();
 			label.Destroy ();
 			defaultSansFontName = defaultSansFont.ToString ();
-		}
-		
-		internal static IEnumerable<FontDescriptionCodon> FontDescriptions {
-			get {
-				return fontDescriptions;
+
+			defaultEditorFontName = defaultMonospaceFontName;
+			editorFontName = fontProperties.Get <string> (EditorKey, defaultMonospaceFontName);
+			editorFont = FontDescription.FromString (editorFontName);
+
+			if (Platform.IsMac) {
+				//On OSX we are using 1 unit smaller font then _DEFAULT_SANS for default PadFont
+				var tempFont = FontDescription.FromString (defaultSansFontName);
+				if (tempFont.SizeIsAbsolute) {
+					tempFont.AbsoluteSize = tempFont.Size - Pango.Scale.PangoScale;
+				} else {
+					tempFont.Size -= (int)Pango.Scale.PangoScale;
+				}
+				defaultPadFontName = tempFont.ToString ();
+			} else {
+				defaultPadFontName = defaultSansFontName;
 			}
+			padFontName = fontProperties.Get <string> (PadKey, defaultPadFontName);
+			padFont = FontDescription.FromString (padFontName);
+
+			defaultOutputPadFontName = defaultMonospaceFontName;
+			outputPadFontName = fontProperties.Get <string> (OutputPadKey, defaultSansFontName);
+			outputPadFont = FontDescription.FromString (outputPadFontName);
 		}
-		
+
 		internal static void Initialize ()
 		{
 			if (fontProperties != null)
 				throw new InvalidOperationException ("Already initialized");
 
 			fontProperties = PropertyService.Get ("FontProperties", new Properties ());
-			
-			AddinManager.AddExtensionNodeHandler ("/MonoDevelop/Ide/Fonts", delegate(object sender, ExtensionNodeEventArgs args) {
-				var codon = (FontDescriptionCodon)args.ExtensionNode;
-				switch (args.Change) {
-				case ExtensionChange.Add:
-					fontDescriptions.Add (codon);
-					break;
-				case ExtensionChange.Remove:
-					fontDescriptions.Remove (codon);
-					if (loadedFonts.ContainsKey (codon.Name))
-						loadedFonts.Remove (codon.Name);
-					break;
-				}
-			});
 
 			LoadDefaults ();
 		}
 
+		internal static string DefaultEditorFontName{ get { return defaultEditorFontName; } }
+
+		internal static string DefaultPadFontName{ get { return defaultPadFontName; } }
+
+		internal static string DefaultOutputPadFontName{ get { return defaultOutputPadFontName; } }
+
 		public static FontDescription MonospaceFont { get { return defaultMonospaceFont; } }
+
 		public static FontDescription SansFont { get { return defaultSansFont; } }
 
+		public static FontDescription EditorFont { get { return editorFont; } }
+
+		public static FontDescription PadFont { get { return padFont; } }
+
+		public static FontDescription OutputPadFont { get { return outputPadFont; } }
+
 		public static string MonospaceFontName { get { return defaultMonospaceFontName; } }
+
 		public static string SansFontName { get { return defaultSansFontName; } }
+
+		public static string EditorFontName {
+			get {
+				return editorFontName;
+			}
+			set {
+				if (value == null)
+					value = defaultEditorFontName;
+				if (value == editorFontName)
+					return;
+				if (value == defaultEditorFontName) {
+					fontProperties.Set ("Editor", null);
+				} else {
+					fontProperties.Set ("Editor", value);
+				}
+				editorFontName = value;
+				editorFont = FontDescription.FromString (value);
+				EditorFontChanged ();
+			}
+		}
+
+		public static string PadFontName {
+			get {
+				return padFontName;
+			}
+			set {
+				if (value == null)
+					value = defaultPadFontName;
+				if (value == padFontName)
+					return;
+				if (value == defaultPadFontName) {
+					fontProperties.Set (PadKey, null);
+				} else {
+					fontProperties.Set (PadKey, value);
+				}
+				padFontName = value;
+				padFont = FontDescription.FromString (value);
+				PadFontChanged ();
+			}
+		}
+
+		public static string OutputPadFontName {
+			get {
+				return outputPadFontName;
+			}
+			set {
+				if (value == null)
+					value = defaultOutputPadFontName;
+				if (value == outputPadFontName)
+					return;
+				if (value == defaultOutputPadFontName) {
+					fontProperties.Set (OutputPadKey, null);
+				} else {
+					fontProperties.Set (OutputPadKey, value);
+				}
+				outputPadFontName = value;
+				outputPadFont = FontDescription.FromString (value);
+				OutputPadFontChanged ();
+			}
+		}
 
 		[Obsolete ("Use MonospaceFont")]
 		public static FontDescription DefaultMonospaceFontDescription {
 			get {
-				if (defaultMonospaceFont == null)
-					defaultMonospaceFont = LoadFont (DesktopService.DefaultMonospaceFont);
 				return defaultMonospaceFont;
 			}
 		}
 
+		[Obsolete]
 		static FontDescription LoadFont (string name)
 		{
 			var fontName = FilterFontName (name);
 			return FontDescription.FromString (fontName);
 		}
-		
+
+		[Obsolete ("Use EditorFontName, PadFontName or OutputPadFontName.")]
 		public static string FilterFontName (string name)
 		{
 			switch (name) {
@@ -122,18 +202,20 @@ namespace MonoDevelop.Ide.Fonts
 				return name;
 			}
 		}
-		
+
+		[Obsolete ("Use EditorFontName, PadFontName or OutputPadFontName.")]
 		public static string GetUnderlyingFontName (string name)
 		{
-			var result = fontProperties.Get<string> (name);
-			
-			if (result == null) {
-				var font = GetFont (name);
-				if (font == null)
-					throw new InvalidOperationException ("Font " + name + " not found.");
-				return font.FontDescription;
+			switch (name) {
+			case EditorKey:
+				return editorFontName;
+			case PadKey:
+				return padFontName;
+			case OutputPadKey:
+				return outputPadFontName;
+			default:
+				throw new InvalidOperationException ("Font " + name + " not found.");
 			}
-			return result;
 		}
 
 		/// <summary>
@@ -148,52 +230,69 @@ namespace MonoDevelop.Ide.Fonts
 		/// <param name='createDefaultFont'>
 		/// If set to <c>false</c> and no custom font has been set, the method will return null.
 		/// </param>
+		[Obsolete ("Use EditorFont, PadFont or OutputPadFont.")]
 		public static FontDescription GetFontDescription (string name, bool createDefaultFont = true)
 		{
-			if (loadedFonts.ContainsKey (name))
-				return loadedFonts [name];
-			return loadedFonts [name] = LoadFont (GetUnderlyingFontName (name));
-		}
-		
-		internal static FontDescriptionCodon GetFont (string name)
-		{
-			foreach (var d in fontDescriptions) {
-				if (d.Name == name)
-					return d;
+			switch (name) {
+			case EditorKey:
+				return EditorFont;
+			case PadKey:
+				return PadFont;
+			case OutputPadKey:
+				return OutputPadFont;
+			default:
+				LoggingService.LogError ("Font " + name + " not found.");
+				return null;
 			}
-			LoggingService.LogError ("Font " + name + " not found.");
-			return null;
 		}
-		
+
+		[Obsolete ("Use EditorFontName, PadFontName or OutputPadFontName.")]
 		public static void SetFont (string name, string value)
 		{
-			if (loadedFonts.ContainsKey (name)) 
-				loadedFonts.Remove (name);
-
-			var font = GetFont (name);
-			if (font != null && font.FontDescription == value) {
-				fontProperties.Set (name, null);
-			} else {
-				fontProperties.Set (name, value);
-			}
-			List<Action> callbacks;
-			if (fontChangeCallbacks.TryGetValue (name, out callbacks)) {
-				callbacks.ForEach (c => c ());
+			switch (name) {
+			case EditorKey:
+				EditorFontName = value;
+				break;
+			case PadKey:
+				PadFontName = value;
+				break;
+			case OutputPadKey:
+				OutputPadFontName = value;
+				break;
+			default:
+				throw new InvalidOperationException ("Font " + name + " not found.");
 			}
 		}
-		
-		static Dictionary<string, List<Action>> fontChangeCallbacks = new Dictionary<string, List<Action>> ();
+
+		public static event Action EditorFontChanged;
+		public static event Action PadFontChanged;
+		public static event Action OutputPadFontChanged;
+
+		[Obsolete ("Use EditorFontChanged, PadFontChanged or OutputPadFontChanged events.")]
 		public static void RegisterFontChangedCallback (string fontName, Action callback)
 		{
-			if (!fontChangeCallbacks.ContainsKey (fontName))
-				fontChangeCallbacks [fontName] = new List<Action> ();
-			fontChangeCallbacks [fontName].Add (callback);
+			switch (fontName) {
+			case EditorKey:
+				EditorFontChanged += callback;
+				break;
+			case PadKey:
+				PadFontChanged += callback;
+				break;
+			case OutputPadKey:
+				OutputPadFontChanged += callback;
+				break;
+			default:
+				LoggingService.LogError ("Font " + fontName + " not found to add callback.");
+				break;
+			}
 		}
-		
+
+		[Obsolete ("Use EditorFontChanged, PadFontChanged or OutputPadFontChanged events.")]
 		public static void RemoveCallback (Action callback)
 		{
-			foreach (var list in fontChangeCallbacks.Values.ToList ())
-				list.Remove (callback);
+			EditorFontChanged -= callback;
+			PadFontChanged -= callback;
+			OutputPadFontChanged -= callback;
 		}
 	}
 

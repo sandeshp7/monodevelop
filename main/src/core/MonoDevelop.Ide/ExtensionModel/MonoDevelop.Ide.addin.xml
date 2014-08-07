@@ -119,12 +119,7 @@
 		<Description>Extensions to the text editor. Classes must be a subclass of TextEditorExtension.</Description>
 		<ExtensionNode name="Tool" type="MonoDevelop.Ide.Extensions.CustomToolExtensionNode"/>
 	</ExtensionPoint>
-	
-	<ExtensionPoint path = "/MonoDevelop/Ide/Fonts" name = "IDE Fonts">
-		<Description>Addins can register own fonts to be configured.</Description>
-		<ExtensionNode name="Font" type="MonoDevelop.Ide.Fonts.FontDescriptionCodon"/>
-	</ExtensionPoint>
-		
+
 	<ExtensionPoint path = "/MonoDevelop/Ide/FeedbackService" name = "Feedback reporting service">
 		<Description>Provides the webservice url to which MonoDevelop will send user feedback.</Description>
 		<ExtensionNode name="Service" type="MonoDevelop.Ide.Extensions.ServiceUrlExtensionNode" />
@@ -254,13 +249,7 @@
 		<Customizer id="MonoDevelop.Ide.Execution.CustomArgsCustomizer" _name="Arguments" />
 		<Customizer id="MonoDevelop.Ide.Execution.MonoExecutionCustomizer" _name="Mono Options" />
 	</Extension>
-	
-	<Extension path="/MonoDevelop/Ide/Fonts">
-		<Font name="Editor" _displayName="Text Editor" default="_DEFAULT_MONOSPACE" />
-		<Font name="Pad" _displayName="General Pad Text" default="_DEFAULT_SANS" />
-		<Font name="OutputPad" _displayName="Output Pad Contents" default="_DEFAULT_MONOSPACE" />
-	</Extension>
-	
+
 	<Extension path = "/MonoDevelop/Core/UserDataMigration">
 		<!-- 2.4 -->
 		<Migration sourceVersion="2.4" kind="UserData" path="KeyBindings.xml" targetPath="KeyBindings/Custom.kb.xml" />
