@@ -35,7 +35,7 @@ using System.Collections.Generic;
 namespace MonoDevelop.VersionControl.Tests
 {
 	[TestFixture]
-	abstract class BaseRepoUtilsTest
+	public abstract class BaseRepoUtilsTest
 	{
 		// [Git] Set user and email.
 		protected const string Author = "author";
