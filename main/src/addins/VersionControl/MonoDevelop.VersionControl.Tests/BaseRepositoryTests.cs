@@ -187,7 +187,7 @@ namespace MonoDevelop.VersionControl.Tests
 
 			// Old cache.
 			vis = Repo.GetDirectoryVersionInfo (LocalPath, false, false);
-			Assert.AreEqual (1 + RepoItemsCount, vis.Length);
+			Assert.AreEqual (1 + RepoItemsCount, vis.Length, "Old DirectoryVersionInfo.");
 
 			// Query.
 			Repo.ClearCachedVersionInfo (LocalPath);
@@ -196,12 +196,12 @@ namespace MonoDevelop.VersionControl.Tests
 
 			// Cached.
 			vis = Repo.GetDirectoryVersionInfo (LocalPath, false, false);
-			Assert.AreEqual (2 + RepoItemsCount, vis.Length);
+			Assert.AreEqual (2 + RepoItemsCount, vis.Length, "New DirectoryVersionInfo.");
 
 			// Wait for result.
 			AddFile ("testfile3", null, true, false);
 			vis = Repo.GetDirectoryVersionInfo (LocalPath, false, true);
-			Assert.AreEqual (4 + RepoItemsCountRecursive, vis.Length);
+			Assert.AreEqual (4 + RepoItemsCountRecursive, vis.Length, "Recursive DirectoryVersionInfo.");
 		}
 
 		[Test]
