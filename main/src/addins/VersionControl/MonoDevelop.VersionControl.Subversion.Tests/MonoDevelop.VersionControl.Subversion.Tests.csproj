@@ -11,6 +11,7 @@
     <AssemblyName>MonoDevelop.VersionControl.Subversion.Tests</AssemblyName>
     <TestRunnerCommand>..\..\..\..\build\bin\mdtool.exe</TestRunnerCommand>
     <TestRunnerArgs>run-md-tests</TestRunnerArgs>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,9 +67,9 @@
       <Name>Mono.Addins</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\external\guiunit\src\framework\GuiUnit_NET_4_0.csproj">
-      <Project>{E13A0A7B-4DE6-43ED-A139-41052D065A9B}</Project>
-      <Name>GuiUnit_NET_4_0</Name>
+    <ProjectReference Include="..\..\..\..\external\guiunit\src\framework\GuiUnit_NET_4_5.csproj">
+      <Project>{D12F0F7B-8DE3-43EC-BA49-41052D065A9B}</Project>
+      <Name>GuiUnit_NET_4_5</Name>
     </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.VersionControl.Tests\MonoDevelop.VersionControl.Tests.csproj">
       <Project>{39ADCF0D-6E64-4331-AA1A-5B7E1AED94AC}</Project>

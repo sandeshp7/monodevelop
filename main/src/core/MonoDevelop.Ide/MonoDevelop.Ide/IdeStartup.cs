@@ -233,9 +233,17 @@ namespace MonoDevelop.Ide
 
 				Counters.Initialization.Trace ("Initializing IdeApp");
 				IdeApp.Initialize (monitor);
-				
+
 				// Load requested files
 				Counters.Initialization.Trace ("Opening Files");
+
+				// load previous combine
+				if (IdeApp.Preferences.LoadPrevSolutionOnStartup && !startupInfo.HasSolutionFile) {
+					var proj = DesktopService.RecentFiles.GetProjects ().FirstOrDefault ();
+					if (proj != null)
+						IdeApp.Workspace.OpenWorkspaceItem (proj.FileName).WaitForCompleted ();
+				}
+
 				IdeApp.OpenFiles (startupInfo.RequestedFileList);
 				
 				monitor.Step (1);
@@ -247,12 +255,8 @@ namespace MonoDevelop.Ide
 			}
 			
 			if (error != null) {
-				LoggingService.LogFatalError (null, error);
-				string message = BrandingService.BrandApplicationName (GettextCatalog.GetString (
-					"MonoDevelop failed to start. The following error has been reported: {0}",
-					error.Message
-				));
-				MessageService.ShowException (error, message);
+				string message = BrandingService.BrandApplicationName (GettextCatalog.GetString ("MonoDevelop failed to start"));
+				MessageService.ShowFatalError (message, null, error);
 				return 1;
 			}
 
@@ -607,7 +611,7 @@ namespace MonoDevelop.Ide
 			if (willShutdown)
 				LoggingService.LogFatalError (msg, ex);
 			else
-				LoggingService.LogCriticalError (msg, ex);
+				LoggingService.LogInternalError (msg, ex);
 		}
 		
 		/// <summary>SDBM-style hash, bounded to a range of 1000.</summary>
@@ -636,36 +640,23 @@ namespace MonoDevelop.Ide
 			options.IdeCustomizer = customizer;
 
 			int ret = -1;
-			bool retry = false;
-			do {
-				try {
-					var exename = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly ().Location);
-					if (!Platform.IsMac && !Platform.IsWindows)
-						exename = exename.ToLower ();
-					Runtime.SetProcessName (exename);
-					var app = new IdeStartup ();
-					ret = app.Run (options);
-					break;
-				} catch (Exception ex) {
-					if (!retry && AddinManager.IsInitialized) {
-						LoggingService.LogWarning (BrandingService.ApplicationName + " failed to start. Rebuilding addins registry.", ex);
-						AddinManager.Registry.Rebuild (new Mono.Addins.ConsoleProgressStatus (true));
-						LoggingService.LogInfo ("Addin registry rebuilt. Restarting {0}.", BrandingService.ApplicationName);
-						retry = true;
-					} else {
-						LoggingService.LogFatalError (
-							string.Format (
-								"{0} failed to start. Some of the assemblies required to run {0} (for example gtk-sharp)" +
-								"may not be properly installed in the GAC.",
-								BrandingService.ApplicationName
-							), ex);
-						retry = false;
-					}
-				} finally {
-					Runtime.Shutdown ();
-				}
+			try {
+				var exename = Path.GetFileNameWithoutExtension (Assembly.GetEntryAssembly ().Location);
+				if (!Platform.IsMac && !Platform.IsWindows)
+					exename = exename.ToLower ();
+				Runtime.SetProcessName (exename);
+				var app = new IdeStartup ();
+				ret = app.Run (options);
+			} catch (Exception ex) {
+				LoggingService.LogFatalError (
+					string.Format (
+						"{0} failed to start. Some of the assemblies required to run {0} (for example gtk-sharp)" +
+						"may not be properly installed in the GAC.",
+						BrandingService.ApplicationName
+					), ex);
+			} finally {
+				Runtime.Shutdown ();
 			}
-			while (retry);
 
 			LoggingService.Shutdown ();
 

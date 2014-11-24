@@ -61,7 +61,23 @@ namespace MonoDevelop.Ide.Desktop
 				return "MonoDevelop";
 			}
 		}
-		
+
+		public virtual void Initialize ()
+		{
+		}
+
+		public virtual void SetGlobalProgressBar (double progress)
+		{
+		}
+
+		public virtual void ShowGlobalProgressBarError ()
+		{
+		}
+
+		public virtual void ShowGlobalProgressBarIndeterminate ()
+		{
+		}
+
 		public virtual void OpenFile (string filename)
 		{
 			Process.Start (filename);
@@ -325,12 +341,6 @@ namespace MonoDevelop.Ide.Desktop
 			return false;
 		}
 
-		public virtual bool ShowContextMenu (MonoDevelop.Components.Commands.CommandManager commandManager,
-			Gtk.Widget widget, double x, double y, MonoDevelop.Components.Commands.CommandEntrySet entrySet, object initialCommandTarget = null)
-		{
-			return false;
-		}
-		
 		// Used for preserve the file attributes when monodevelop opens & writes a file.
 		// This should work on unix & mac platform.
 		public virtual object GetFileAttributes (string fileName)

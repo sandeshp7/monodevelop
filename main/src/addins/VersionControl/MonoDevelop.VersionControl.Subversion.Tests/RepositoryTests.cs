@@ -121,6 +121,12 @@ namespace VersionControl.Subversion.Unix.Tests
 			});
 		}
 
+		[Test]
+		public void DoesntDieInReposWithNoRevisions ()
+		{
+			Repo.GetHistory (LocalPath, null);
+		}
+
 		protected override void TestValidUrl ()
 		{
 			base.TestValidUrl ();
