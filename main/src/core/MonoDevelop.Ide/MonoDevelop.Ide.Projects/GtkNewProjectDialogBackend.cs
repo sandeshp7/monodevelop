@@ -202,7 +202,7 @@ namespace MonoDevelop.Ide.Projects
 		void AddSubTemplateCategory (TemplateCategory category)
 		{
 			templateCategoriesListStore.AppendValues (
-				GLib.Markup.EscapeText (category.Name),
+				MarkupSubLevelCategoryName (category.Name),
 				null,
 				category);
 		}
@@ -212,9 +212,19 @@ namespace MonoDevelop.Ide.Projects
 			return "<span font_weight='bold'>" + GLib.Markup.EscapeText (name) + "</span>";
 		}
 
+		static string MarkupSubLevelCategoryName (string name)
+		{
+			return "<span size='smaller'>" + GLib.Markup.EscapeText (name) + "</span>";
+		}
+
+		static string MarkupTemplateDescription (string description)
+		{
+			return MarkupSubLevelCategoryName (description);
+		}
+
 		static string MarkupTemplateName (string name)
 		{
-			return "<span font_weight='bold' size='larger'>" + GLib.Markup.EscapeText (name) + "</span>";
+			return MarkupTopLevelCategoryName (name);
 		}
 
 		void ShowTemplatesForSelectedCategory ()
@@ -295,7 +305,7 @@ namespace MonoDevelop.Ide.Projects
 		void ShowTemplate (SolutionTemplate template)
 		{
 			templateNameLabel.Markup = MarkupTemplateName (template.Name);
-			templateDescriptionLabel.Text = template.Description;
+			templateDescriptionLabel.Markup = MarkupTemplateDescription (template.Description);
 			templateImage.Image = controller.GetImage (template);
 			templateVBox.Visible = true;
 			templateVBox.ShowAll ();
