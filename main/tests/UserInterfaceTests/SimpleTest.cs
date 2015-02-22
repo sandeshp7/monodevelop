@@ -61,7 +61,59 @@ namespace UserInterfaceTests
 
 			Ide.CloseAll ();
 		}
+			
 
+		[Test, Description("To Check if a build error is dislayed and then fix the error and check if build is successful")]
+		public void FixBuildErrors ()
+		{
+			var slnFile = Ide.OpenTestSolution ("ConsoleApp-VS2010/ConsoleApplication.sln");
+			var slnDir = slnFile.ParentDirectory;
+
+			var exe = slnDir.Combine ("bin", "Debug", "ConsoleApplication.exe");
+			Assert.IsFalse (File.Exists (exe));
+
+			Ide.OpenFile (slnFile.ParentDirectory.Combine ("Program.cs"));
+
+
+			//select text editor, move down 10 lines, and insert a statement
+			Session.SelectActiveWidget ();
+			Session.ExecuteCommand (TextEditorCommands.DocumentStart);
+
+			// Delete all the code already existing
+			for(int i=0;i<20;i++){
+				Session.ExecuteCommand (TextEditorCommands.DeleteLine);
+			}
+
+			// Entering Program With an Error
+
+			Session.TypeText ("using System;");
+			Session.TypeText ("\nnamespace ConsoleProject {");
+			Session.TypeText ("\nclass MainClass {");
+			Session.TypeText ("\npublic static void Main (string[] args) {");
+			Session.TypeText ("\nList<string> s = new List<string> () {\"one\", \"two\", \"three\"};");
+			Session.TypeText ("\nConsole.WriteLine (\"Hello Xamarin!\"); }");
+			Session.TypeText ("\n} \n}");
+
+			var status = Ide.BuildSolutionAndReturnStatus ();
+
+
+			Assert.AreEqual (status, "Build: 1 error, 0 warnings");
+
+			//Fixing the error
+			Session.ExecuteCommand (TextEditorCommands.DocumentStart);
+
+			Session.TypeText ("using System.Collections.Generic;\n");
+
+			status = Ide.BuildSolutionAndReturnStatus ();
+
+			Assert.AreEqual (status, "Build: 0 errors, 1 warning");
+
+			AssertExeHasOutput (exe, "Hello Xamarin!");
+
+			Ide.CloseAll ();
+
+		}
+			
 		void AssertExeHasOutput (string exe, string expectedOutput)
 		{
 			var sw = new StringWriter ();

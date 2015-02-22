@@ -81,6 +81,16 @@ namespace UserInterfaceTests
 			Assert.AreEqual (status, "Build successful.");
 		}
 
+		public static String BuildSolutionAndReturnStatus ()
+		{
+			RunAndWaitForTimer (
+				() => Session.ExecuteCommand (ProjectCommands.BuildSolution),
+				"MonoDevelop.Ide.Counters.BuildItemTimer"
+			);
+
+			return GetStatusMessage ();
+		}
+
 		static void WaitUntil (Func<bool> done, int timeout = 20000, int pollStep = 200)
 		{
 			do {
