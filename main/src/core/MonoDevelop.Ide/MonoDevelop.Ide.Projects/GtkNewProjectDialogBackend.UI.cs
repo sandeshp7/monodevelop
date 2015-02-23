@@ -216,6 +216,7 @@ namespace MonoDevelop.Ide.Projects
 
 			// Next button - bottom right.
 			nextButton = new Button ();
+			nextButton.Name = "buttonNext";
 			nextButton.Label = GettextCatalog.GetString ("Next");
 			previousNextButtonBox.PackEnd (nextButton);
 

@@ -55,7 +55,6 @@ namespace UserInterfaceTests
 				() => Session.GlobalInvoke ("MonoDevelop.Ide.IdeApp.Workspace.OpenWorkspaceItem", (string)path),
 				"MonoDevelop.Ide.Counters.OpenWorkspaceItemTimer"
 			);
-
 			return path;
 		}
 
@@ -127,23 +126,23 @@ namespace UserInterfaceTests
 		public static void CreateProject (string name, string category, string kind, FilePath directory)
 		{
 			Session.ExecuteCommand (FileCommands.NewProject);
-			Session.WaitForWindow ("MonoDevelop.Ide.Projects.NewProjectDialog");
-
-			Session.SelectWidget ("lst_template_types");
-			Session.SelectTreeviewItem (category);
-
-			Session.SelectWidget ("boxTemplates");
+			Thread.Sleep (1000);
+						
+			Session.SelectActiveWidget ();
 			var cells = Session.GetTreeviewCells ();
-			var cellName = cells.First (c => c!= null && c.StartsWith (kind + "\n", StringComparison.Ordinal));
+			var cellName = cells.First (c => c!= null && c.StartsWith (kind, StringComparison.Ordinal));
 			Session.SelectTreeviewItem (cellName);
 
-			Gui.EnterText ("txt_name", name);
-			Gui.EnterText ("entry_location", directory);
+			Gui.PressButton ("buttonNext");
+
+			Thread.Sleep (1000);
+			Session.SelectActiveWidget ();
+			Gui.EnterText ("projectNameTextBox", name);
 
 			RunAndWaitForTimer (
-				() => Gui.PressButton ("btn_new"),
+				() => Session.PressKey (Gdk.Key.Return),
 				"MonoDevelop.Ide.Counters.OpenDocumentTimer"
-			);
+				);
 		}
 	}
 
