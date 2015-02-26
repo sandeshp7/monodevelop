@@ -138,6 +138,7 @@ namespace UserInterfaceTests
 			Thread.Sleep (1000);
 			Session.SelectActiveWidget ();
 			Gui.EnterText ("projectNameTextBox", name);
+			Gui.EnterText ("locationTextBox", directory);
 
 			RunAndWaitForTimer (
 				() => Session.PressKey (Gdk.Key.Return),

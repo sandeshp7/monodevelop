@@ -72,6 +72,8 @@ namespace UserInterfaceTests
 
 			var projectDirectory = Util.CreateTmpDir (projectName);
 
+			var exe = projectDirectory.Combine (projectName, projectName, "bin", "Debug", "ConsoleProject.exe");
+
 			Ide.CreateProject (projectName, projectCategory, projectKind, projectDirectory);
 
 			//select text editor, move down 10 lines, and insert a statement
@@ -107,6 +109,8 @@ namespace UserInterfaceTests
 			status = Ide.BuildSolutionAndReturnStatus ();
 
 			Assert.AreEqual (status, "Build: 0 errors, 1 warning");
+
+			AssertExeHasOutput (exe, "Hello Xamarin!");
 
 			Ide.CloseAll ();
 		}
